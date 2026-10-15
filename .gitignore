@@ -1,0 +1,16 @@
+# dependencias y build
+node_modules
+dist
+*.tsbuildinfo
+
+# originales pesados (un archivo pesa 48 MB); los WebP optimizados sí van en public/img
+art-source
+
+# capturas de prueba y logs
+shots
+*.log
+
+# editor y sistema
+.vscode
+.DS_Store
+Thumbs.db
