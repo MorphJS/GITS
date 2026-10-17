@@ -3,8 +3,11 @@ import { ArtImg } from '../art'
 import { CHAPTERS, GLOSSARY, STORY_ART } from '../data'
 import { gsap, prefersReduced, scrollToY, ScrollTrigger } from '../motion'
 
-const N = CHAPTERS.length
-const pad = (n: number, l = 2) => String(n).padStart(l, '0')
+const TOTAL = CHAPTERS.length
+
+function pad(n: number) {
+  return String(n).padStart(2, '0')
+}
 
 export default function Story() {
   const reduced = useRef(prefersReduced()).current
@@ -15,67 +18,86 @@ export default function Story() {
 
   useEffect(() => {
     if (reduced) return
+
     const ctx = gsap.context(() => {
       const years = gsap.utils.toArray<HTMLElement>('.story__yr')
-      const arts = gsap.utils.toArray<HTMLElement>('.story__fig')
+      const figures = gsap.utils.toArray<HTMLElement>('.story__fig')
       const copies = gsap.utils.toArray<HTMLElement>('.story__copy-item')
 
-      // --- Cambio de capítulo (año, ilustración y texto) ---
-      // Lo que sale desaparece rápido (0.25 s) y lo que entra espera ese tiempo: nunca hay dos
-      // textos visibles a la vez, así no se encima el título viejo con el nuevo.
-      let current = -1
-      const show = (i: number, instant = false) => {
-        const out = instant ? 0 : 0.25
+      let shown = -1
+
+      function show(i: number, instant = false) {
+        const outTime = instant ? 0 : 0.25
         const wait = instant ? 0 : 0.22
-        years.forEach((el, k) => gsap.to(el, k === i
-          ? { opacity: 1, yPercent: 0, duration: instant ? 0 : 0.8, delay: wait, ease: 'power3.out', overwrite: 'auto' }
-          : { opacity: 0, yPercent: k < i ? -35 : 35, duration: out, ease: 'power2.in', overwrite: 'auto' }))
-        arts.forEach((el, k) => gsap.to(el, k === i
-          ? { opacity: 1, yPercent: 0, scale: 1, rotate: 0, duration: instant ? 0 : 1, delay: wait, ease: 'power3.out', overwrite: 'auto' }
-          : { opacity: 0, yPercent: k < i ? -5 : 5, scale: 0.95, rotate: k < i ? -3 : 3, duration: out, ease: 'power2.in', overwrite: 'auto' }))
-        copies.forEach((el, k) => gsap.to(el, k === i
-          ? { opacity: 1, y: 0, duration: instant ? 0 : 0.7, delay: wait + 0.08, ease: 'power3.out', overwrite: 'auto' }
-          : { opacity: 0, y: k < i ? -20 : 20, duration: out, ease: 'power2.in', overwrite: 'auto' }))
-        current = i
+
+        years.forEach((el, k) => {
+          if (k === i) {
+            gsap.to(el, { opacity: 1, yPercent: 0, duration: instant ? 0 : 0.8, delay: wait, ease: 'power3.out', overwrite: 'auto' })
+          } else {
+            gsap.to(el, { opacity: 0, yPercent: k < i ? -35 : 35, duration: outTime, ease: 'power2.in', overwrite: 'auto' })
+          }
+        })
+
+        figures.forEach((el, k) => {
+          if (k === i) {
+            gsap.to(el, { opacity: 1, yPercent: 0, scale: 1, rotate: 0, duration: instant ? 0 : 1, delay: wait, ease: 'power3.out', overwrite: 'auto' })
+          } else {
+            gsap.to(el, { opacity: 0, yPercent: k < i ? -5 : 5, scale: 0.95, rotate: k < i ? -3 : 3, duration: outTime, ease: 'power2.in', overwrite: 'auto' })
+          }
+        })
+
+        copies.forEach((el, k) => {
+          if (k === i) {
+            gsap.to(el, { opacity: 1, y: 0, duration: instant ? 0 : 0.7, delay: wait + 0.08, ease: 'power3.out', overwrite: 'auto' })
+          } else {
+            gsap.to(el, { opacity: 0, y: k < i ? -20 : 20, duration: outTime, ease: 'power2.in', overwrite: 'auto' })
+          }
+        })
+
+        shown = i
         setActive(i)
       }
+
       show(0, true)
 
-      // --- El avance del scroll por la pista decide el capítulo activo ---
       ScrollTrigger.create({
-        trigger: track.current, start: 'top top', end: 'bottom bottom',
+        trigger: track.current,
+        start: 'top top',
+        end: 'bottom bottom',
         onUpdate: (self) => {
-          const i = Math.min(N - 1, Math.floor(self.progress * N))
-          if (i !== current) show(i)
+          const i = Math.min(TOTAL - 1, Math.floor(self.progress * TOTAL))
+          if (i !== shown) show(i)
         },
       })
 
-      // --- Interacción con el mouse: capas a distinta profundidad ---
       if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-        const st = stage.current!
-        const artX = gsap.quickTo('.story__art', 'rotationY', { duration: 1, ease: 'power3.out' })
-        const artY = gsap.quickTo('.story__art', 'rotationX', { duration: 1, ease: 'power3.out' })
-        const yrX = gsap.quickTo('.story__years', 'x', { duration: 1.2, ease: 'power3.out' })
-        const yrY = gsap.quickTo('.story__years', 'y', { duration: 1.2, ease: 'power3.out' })
-        const move = (e: PointerEvent) => {
-          const r = st.getBoundingClientRect()
-          const nx = ((e.clientX - r.left) / r.width) * 2 - 1
-          const ny = ((e.clientY - r.top) / r.height) * 2 - 1
-          artX(nx * 14); artY(-ny * 10)
-          yrX(-nx * 26); yrY(-ny * 16)
+        const area = stage.current!
+        const tiltY = gsap.quickTo('.story__art', 'rotationY', { duration: 1, ease: 'power3.out' })
+        const tiltX = gsap.quickTo('.story__art', 'rotationX', { duration: 1, ease: 'power3.out' })
+        const driftX = gsap.quickTo('.story__years', 'x', { duration: 1.2, ease: 'power3.out' })
+        const driftY = gsap.quickTo('.story__years', 'y', { duration: 1.2, ease: 'power3.out' })
+
+        const onMove = (e: PointerEvent) => {
+          const rect = area.getBoundingClientRect()
+          const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1
+          const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1
+          tiltY(nx * 14)
+          tiltX(-ny * 10)
+          driftX(-nx * 26)
+          driftY(-ny * 16)
         }
-        st.addEventListener('pointermove', move)
-        return () => st.removeEventListener('pointermove', move)
+        area.addEventListener('pointermove', onMove)
+        return () => area.removeEventListener('pointermove', onMove)
       }
     }, root)
+
     return () => ctx.revert()
   }, [reduced])
 
-  // Los botones de la línea de tiempo llevan al centro de la franja de cada capítulo.
   const goTo = useCallback((i: number) => {
-    const t = track.current!
-    const top = t.getBoundingClientRect().top + window.scrollY
-    scrollToY(top + (t.offsetHeight - window.innerHeight) * ((i + 0.5) / N))
+    const el = track.current!
+    const top = el.getBoundingClientRect().top + window.scrollY
+    scrollToY(top + (el.offsetHeight - window.innerHeight) * ((i + 0.5) / TOTAL))
   }, [])
 
   if (reduced) {
@@ -87,7 +109,11 @@ export default function Story() {
           {CHAPTERS.map((c, i) => (
             <li key={c.year}>
               <div className="frame"><ArtImg id={STORY_ART[i]} sizes="(max-width: 899px) 80vw, 30vw" /></div>
-              <div><span className="mono chapter__year">{c.year}</span><h3>{c.title}</h3><p>{c.text}</p></div>
+              <div>
+                <span className="mono chapter__year">{c.year}</span>
+                <h3>{c.title}</h3>
+                <p>{c.text}</p>
+              </div>
             </li>
           ))}
         </ol>
@@ -98,11 +124,11 @@ export default function Story() {
 
   return (
     <section className="story" id="historia" ref={root}>
-      <div className="story__track" ref={track} style={{ ['--n' as string]: N }}>
+      <div className="story__track" ref={track} style={{ ['--n' as string]: TOTAL }}>
         <div className="story__stage" ref={stage}>
           <div className="story__top mono">
             <span className="label">01 / Historia</span>
-            <span>{pad(active + 1)} / {pad(N)}</span>
+            <span>{pad(active + 1)} / {pad(TOTAL)}</span>
           </div>
 
           <div className="story__years" aria-hidden="true">
@@ -145,16 +171,24 @@ export default function Story() {
 
 function Glossary() {
   const ref = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     if (prefersReduced()) return
+
     const ctx = gsap.context(() => {
       gsap.from('.glossary__item', {
-        opacity: 0, y: 48, duration: 1, ease: 'power3.out', stagger: 0.12,
+        opacity: 0,
+        y: 48,
+        duration: 1,
+        ease: 'power3.out',
+        stagger: 0.12,
         scrollTrigger: { trigger: ref.current, start: 'top 80%', once: true },
       })
     }, ref)
+
     return () => ctx.revert()
   }, [])
+
   return (
     <div className="glossary section" ref={ref}>
       <span className="mono label">Glosario</span>

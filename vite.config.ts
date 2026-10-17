@@ -1,9 +1,6 @@
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// Chrome bloquea <script type="module"> y los recursos con "crossorigin" al abrir un HTML con doble clic
-// (file://), y la página queda en blanco. Como entrega escolar, el build se emite como script clásico
-// (IIFE + defer) para que dist/index.html funcione igual con doble clic, en un servidor o en GitHub Pages.
 function classicScript(): Plugin {
   return {
     name: 'classic-script',
@@ -18,8 +15,6 @@ function classicScript(): Plugin {
   }
 }
 
-// base './' → rutas relativas: el build funciona en cualquier subruta de GitHub Pages
-// (usuario.github.io/repo/) sin tener que conocer el nombre del repo.
 export default defineConfig({
   base: './',
   plugins: [react(), classicScript()],

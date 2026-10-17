@@ -14,21 +14,21 @@ import Footer from './components/Footer'
 export default function App() {
   const [ready, setReady] = useState(false)
 
-  // useLayoutEffect: corre antes que los efectos de los hijos, así el scroll ya está bloqueado
-  // cuando arranca el preloader.
   useLayoutEffect(() => {
     document.documentElement.classList.add('is-loading')
-    const stop = startSmoothScroll()
+    const stopScroll = startSmoothScroll()
     getLenis()?.stop()
-    const refresh = () => ScrollTrigger.refresh()
-    window.addEventListener('load', refresh)
+
+    const onLoad = () => ScrollTrigger.refresh()
+    window.addEventListener('load', onLoad)
+
     return () => {
-      window.removeEventListener('load', refresh)
-      stop()
+      window.removeEventListener('load', onLoad)
+      stopScroll()
     }
   }, [])
 
-  const onDone = useCallback(() => {
+  const finishLoading = useCallback(() => {
     document.documentElement.classList.remove('is-loading')
     getLenis()?.start()
     setReady(true)
@@ -37,7 +37,7 @@ export default function App() {
 
   return (
     <>
-      <Preloader onDone={onDone} />
+      <Preloader onDone={finishLoading} />
       <Backdrop />
       <div className="grain" aria-hidden="true" />
       <Header />

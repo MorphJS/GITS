@@ -2,25 +2,29 @@ import manifest from './art-manifest.json'
 import { BACKGROUNDS, CONCEPTS, ILLUSTRATIONS } from './data'
 
 type Size = { w: number; h: number }
-const sizesOf = (id: string) => manifest[id as keyof typeof manifest] as unknown as Record<'800' | '2000', Size>
 
-const ALL = [...ILLUSTRATIONS, ...BACKGROUNDS, ...CONCEPTS]
-const altOf = (id: string) => ALL.find((w) => w.id === id)?.alt ?? ''
-
-export const aspectOf = (id: string) => {
-  const s = sizesOf(id)['2000']
-  return s.w / s.h
+function sizesOf(id: string) {
+  return manifest[id as keyof typeof manifest] as unknown as Record<'800' | '2000', Size>
 }
 
-type Props = { id: string; sizes: string; eager?: boolean; className?: string; draggable?: boolean }
+const ALL_WORKS = [...ILLUSTRATIONS, ...BACKGROUNDS, ...CONCEPTS]
 
-// Imagen responsiva: dos tamaños WebP + dimensiones reales (reserva espacio, evita saltos de layout).
+export function aspectOf(id: string) {
+  const { w, h } = sizesOf(id)['2000']
+  return w / h
+}
+
+type Props = { id: string; sizes: string; eager?: boolean; className?: string }
+
 export function ArtImg({ id, sizes, eager, className }: Props) {
   const s = sizesOf(id)
-  // Si la fuente es pequeña, los dos tamaños coinciden: se deja un solo candidato en srcset.
-  const srcSet = s['800'].w === s['2000'].w
-    ? `./img/${id}-800.webp ${s['800'].w}w`
-    : `./img/${id}-800.webp ${s['800'].w}w, ./img/${id}-2000.webp ${s['2000'].w}w`
+  const alt = ALL_WORKS.find((w) => w.id === id)?.alt ?? ''
+
+  let srcSet = `./img/${id}-800.webp ${s['800'].w}w`
+  if (s['800'].w !== s['2000'].w) {
+    srcSet += `, ./img/${id}-2000.webp ${s['2000'].w}w`
+  }
+
   return (
     <img
       className={className}
@@ -29,7 +33,7 @@ export function ArtImg({ id, sizes, eager, className }: Props) {
       sizes={sizes}
       width={s['2000'].w}
       height={s['2000'].h}
-      alt={altOf(id)}
+      alt={alt}
       loading={eager ? 'eager' : 'lazy'}
       decoding="async"
       draggable={false}

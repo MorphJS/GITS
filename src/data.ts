@@ -1,4 +1,3 @@
-// Contenido del sitio. Solo hechos comprobables (años, directores, estudios).
 export const CHAPTERS = [
   { year: '1989', title: 'El manga', text: 'Masamune Shirow publica el manga original en la revista Young Magazine, de la editorial Kodansha. Ahí nacen la Mayor Motoko Kusanagi y la Sección 9.' },
   { year: '1995', title: 'La película', text: 'Mamoru Oshii dirige la adaptación animada, producida por Production I.G. Es la versión que llevó la saga fuera de Japón.' },
@@ -6,14 +5,14 @@ export const CHAPTERS = [
   { year: '2004', title: 'Innocence', text: 'Mamoru Oshii vuelve a dirigir una película de la saga, con Batou como figura central.' },
   { year: '2017', title: 'Live-action', text: 'Rupert Sanders dirige la adaptación con actores reales, protagonizada por Scarlett Johansson.' },
   { year: '2020', title: 'SAC_2045', text: 'Serie original de Netflix dirigida por Shinji Aramaki y Kenji Kamiyama, en animación 3D.' },
-] as const
+]
 
 export const GLOSSARY = [
   { term: 'Ghost', text: 'La conciencia de una persona: aquello que la hace ser quien es, aunque su cuerpo sea artificial.' },
   { term: 'Shell', text: 'El cuerpo, total o parcialmente cibernético, que alberga al ghost.' },
   { term: 'Sección 9', text: 'La unidad de seguridad pública que investiga crímenes de ciberterrorismo y espionaje.' },
   { term: 'Net', text: 'La red global a la que las mentes pueden conectarse directamente.' },
-] as const
+]
 
 export const BOX_CONTENTS = [
   'Libro de arte con ilustraciones de Shirow',
@@ -21,15 +20,12 @@ export const BOX_CONTENTS = [
   'Serie Stand Alone Complex, edición de coleccionista',
   'Cuatro láminas impresas y numeradas',
   'Banda sonora en vinilo',
-] as const
-
+]
 
 export const CREDIT_ART = 'Ilustraciones de Shirow Masamune y un fotograma de la película · Fuentes: theghostintheshell.jp e imágenes aportadas por el autor del proyecto · Incluye obras de otras series del autor, mostradas como muestra de su trabajo · © Shirow Masamune / Kodansha / Production I.G.'
 
-// ---- Arte: cada obra pertenece a una sola categoría ----
 export type Work = { id: string; title: string; alt: string }
 
-// Ilustraciones de Shirow Masamune (muestra del libro de arte) y un fotograma de la película.
 export const ILLUSTRATIONS: Work[] = [
   { id: 'official-10', title: 'Anillo de interfaz', alt: 'Ilustración de Shirow Masamune: figura de pelo azul agachada frente a un anillo de interfaz.' },
   { id: 'gits-head', title: 'Cabeza mecánica (fotograma)', alt: 'Fotograma animado: una cabeza mecánica blanca con cables, sobre fondo negro y marcas verdes.' },
@@ -44,14 +40,12 @@ export const ILLUSTRATIONS: Work[] = [
   { id: 'official-09', title: 'Bestia mecánica entre llamas', alt: 'Ilustración de Shirow Masamune: joven con capucha naranja sobre una bestia mecánica entre llamas.' },
 ]
 
-// Escenarios pintados: callejones, torres al atardecer y estructuras de la ciudad.
 export const BACKGROUNDS: Work[] = [
   { id: 'bg-79', title: 'Torres al atardecer', alt: 'Fondo pintado: rascacielos recortados contra un sol rojo y nubes.' },
   { id: 'bg-65', title: 'Callejón entre edificios', alt: 'Fondo pintado: callejón estrecho visto desde abajo, entre muros con tuberías y aires acondicionados.' },
   { id: 'bg-92', title: 'Estructuras desde abajo', alt: 'Fondo pintado: vigas y tuberías vistas desde abajo, con un charco blanco en el techo.' },
 ]
 
-// Material de producción de Production I.G.: storyboards, dibujos clave y diseños de armas y vehículos.
 export const CONCEPTS: Work[] = [
   { id: 'sb-025', title: 'Storyboard: cabeza mecánica y cerebro', alt: 'Dos viñetas de storyboard a lápiz: una cabeza mecánica abierta con cables y un cerebro con anotaciones.' },
   { id: 'kd-051', title: 'Dibujos clave: poses con pistola', alt: 'Hoja de dibujos clave a lápiz: una figura sentada que se ajusta las botas y sostiene una pistola.' },
@@ -64,5 +58,4 @@ export const CONCEPTS: Work[] = [
   { id: 'tv-016', title: 'Diseño final de tanque', alt: 'Hoja de diseño de un tanque multipata con una silueta humana como referencia de escala.' },
 ]
 
-// Una obra por capítulo de la sección Historia (ambientación, no se afirma relación con el año).
 export const STORY_ART = ['official-10', 'sb-025', 'kd-051', 'kd-052', 'kd-053', 'official-01']

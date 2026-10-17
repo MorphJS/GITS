@@ -1,5 +1,3 @@
-// Verificación visual: node scripts/check.mjs  (requiere `npm run build` y `npm run preview -- --port 4173`)
-// Captura cada sección en 4 viewports y reporta errores de consola / red / desbordes horizontales.
 import { chromium } from 'playwright'
 import { mkdir } from 'node:fs/promises'
 
@@ -27,17 +25,15 @@ for (const [name, width, height] of VIEWPORTS) {
   await page.goto(URL, { waitUntil: 'load' })
   await page.waitForTimeout(500)
   await page.screenshot({ path: `shots/${name}-00-preloader.png` })
-  await page.waitForTimeout(3600) // contador + cortina
+  await page.waitForTimeout(3600)
   for (const [i, sel] of SECTIONS.entries()) {
     await page.evaluate((s) => {
       const el = document.querySelector(s)
       window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY)
     }, sel)
     await page.waitForTimeout(1400)
-    // Para la galería anclada y la historia: una segunda captura más adentro.
     await page.screenshot({ path: `shots/${name}-${String(i + 1).padStart(2, '0')}-${sel.slice(1)}.png` })
     if (sel === '#historia') {
-      // Recorre la pista de la Historia: 3 puntos de avance.
       for (const f of [0.35, 0.65, 0.95]) {
         await page.evaluate((f) => {
           const t = document.querySelector('.story__track')

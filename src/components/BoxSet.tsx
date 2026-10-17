@@ -8,43 +8,43 @@ export default function BoxSet() {
 
   useEffect(() => {
     const el = box.current!
+    const section = root.current!
+
     const ctx = gsap.context(() => {
       gsap.set(el, { rotationY: -24, rotationX: 8 })
       if (prefersReduced()) return
 
-      const ry = gsap.quickTo(el, 'rotationY', { duration: 0.9, ease: 'power3.out' })
-      const rx = gsap.quickTo(el, 'rotationX', { duration: 0.9, ease: 'power3.out' })
-      const hoverable = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+      const turnY = gsap.quickTo(el, 'rotationY', { duration: 0.9, ease: 'power3.out' })
+      const turnX = gsap.quickTo(el, 'rotationX', { duration: 0.9, ease: 'power3.out' })
 
-      if (hoverable) {
-        // El mouse se normaliza a [-1, 1] respecto al centro de la sección y se mapea a un ángulo.
+      if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
         const onMove = (e: PointerEvent) => {
-          const r = root.current!.getBoundingClientRect()
-          const nx = ((e.clientX - r.left) / r.width) * 2 - 1
-          const ny = ((e.clientY - r.top) / r.height) * 2 - 1
-          ry(-24 + nx * 34)
-          rx(8 - ny * 16)
+          const rect = section.getBoundingClientRect()
+          const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1
+          const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1
+          turnY(-24 + nx * 34)
+          turnX(8 - ny * 16)
         }
-        const sec = root.current!
-        sec.addEventListener('pointermove', onMove)
-        return () => sec.removeEventListener('pointermove', onMove)
+        section.addEventListener('pointermove', onMove)
+        return () => section.removeEventListener('pointermove', onMove)
       }
-      // Sin mouse (táctil): vaivén automático.
+
       gsap.to(el, { rotationY: 12, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1 })
     }, root)
+
     return () => ctx.revert()
   }, [])
 
   return (
     <section className="boxset section" id="boxset" ref={root}>
-            <div className="boxset__grid">
+      <div className="boxset__grid">
         <div className="boxset__text">
           <span className="mono label">05 / Legacy Box Set</span>
           <h2 className="display">Edición <em>Legacy</em></h2>
           <p className="lead">Un concepto de colección que reúne la saga en una sola caja.</p>
           <ul className="boxset__list">
-            {BOX_CONTENTS.map((c, i) => (
-              <li key={c}><span className="mono">{String(i + 1).padStart(2, '0')}</span>{c}</li>
+            {BOX_CONTENTS.map((item, i) => (
+              <li key={item}><span className="mono">{String(i + 1).padStart(2, '0')}</span>{item}</li>
             ))}
           </ul>
           <p className="mono note">Concepto escolar · No es un producto real ni está a la venta.</p>

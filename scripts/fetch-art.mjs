@@ -1,7 +1,3 @@
-// Descarga el arte oficial listado en el artículo de theghostintheshell.jp.
-// Uso (Node 18+, sin dependencias):  node scripts/fetch-art.mjs
-// Guarda en art-source/official-XX.jpg. Revisa cada imagen: la muestra incluye
-// obras de Shirow Masamune que no son de GITS (Appleseed, Dominion, etc.).
 import { mkdir, writeFile, access } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'

@@ -1,5 +1,3 @@
-// Deriva una versión con transparencia del logo real (sin redibujarlo):
-// recorta el margen negro y usa la luminancia como canal alfa (blanco sobre transparente).
 import sharp from 'sharp'
 
 const input = 'public/brand/gits-logo.png'

@@ -8,15 +8,31 @@ export default function Backgrounds() {
 
   useEffect(() => {
     if (prefersReduced()) return
+
     const ctx = gsap.context(() => {
-      gsap.utils.toArray<HTMLElement>('.vista').forEach((el) => {
-        const img = el.querySelector('img')
-        // Parallax: la imagen es más grande que su marco y se desplaza más despacio que la página.
-        gsap.fromTo(img, { yPercent: -8 }, { yPercent: 8, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } })
-        gsap.from(el.querySelector('.vista__frame'), { opacity: 0, y: 80, duration: 1.3, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 85%', once: true } })
-        gsap.from(el.querySelector('.vista__num'), { opacity: 0, x: -60, duration: 1.4, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 70%', once: true } })
+      gsap.utils.toArray<HTMLElement>('.vista').forEach((vista) => {
+        gsap.fromTo(
+          vista.querySelector('img'),
+          { yPercent: -8 },
+          { yPercent: 8, ease: 'none', scrollTrigger: { trigger: vista, start: 'top bottom', end: 'bottom top', scrub: true } },
+        )
+        gsap.from(vista.querySelector('.vista__frame'), {
+          opacity: 0,
+          y: 80,
+          duration: 1.3,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: vista, start: 'top 85%', once: true },
+        })
+        gsap.from(vista.querySelector('.vista__num'), {
+          opacity: 0,
+          x: -60,
+          duration: 1.4,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: vista, start: 'top 70%', once: true },
+        })
       })
     }, root)
+
     return () => ctx.revert()
   }, [])
 
@@ -28,15 +44,18 @@ export default function Backgrounds() {
         <p className="lead">Escenarios pintados: callejones, torres al atardecer y estructuras de la ciudad.</p>
       </div>
 
-      {BACKGROUNDS.map((w, i) => (
-        <figure className="vista" key={w.id}>
-          <div className="vista__frame">
-            <ArtImg id={w.id} sizes="100vw" />
-            <span className="vista__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-          </div>
-          <figcaption className="mono"><span>FONDO {String(i + 1).padStart(2, '0')}</span><span>{w.title}</span></figcaption>
-        </figure>
-      ))}
+      {BACKGROUNDS.map((w, i) => {
+        const n = String(i + 1).padStart(2, '0')
+        return (
+          <figure className="vista" key={w.id}>
+            <div className="vista__frame">
+              <ArtImg id={w.id} sizes="100vw" />
+              <span className="vista__num" aria-hidden="true">{n}</span>
+            </div>
+            <figcaption className="mono"><span>FONDO {n}</span><span>{w.title}</span></figcaption>
+          </figure>
+        )
+      })}
     </section>
   )
 }

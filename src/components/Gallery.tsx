@@ -8,19 +8,22 @@ export default function Gallery() {
   const track = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // matchMedia: en escritorio con movimiento permitido la galería se ancla (pin) y avanza en horizontal.
-    // En móvil o con reduced-motion queda el scroll horizontal nativo con snap (ver CSS).
     const mm = gsap.matchMedia()
+
     mm.add('(min-width: 900px) and (prefers-reduced-motion: no-preference)', () => {
-      const sec = root.current!
-      const tr = track.current!
-      sec.classList.add('is-pinned')
-      const dist = () => Math.max(0, tr.scrollWidth - window.innerWidth)
-      const st = { trigger: sec, start: 'top top', end: () => '+=' + dist(), scrub: 1, invalidateOnRefresh: true }
-      gsap.to(tr, { x: () => -dist(), ease: 'none', scrollTrigger: { ...st, pin: true, anticipatePin: 1 } })
-      gsap.to('.gallery__progress i', { scaleX: 1, ease: 'none', scrollTrigger: { ...st, scrub: true } })
-      return () => sec.classList.remove('is-pinned')
+      const section = root.current!
+      const strip = track.current!
+      section.classList.add('is-pinned')
+
+      const distance = () => Math.max(0, strip.scrollWidth - window.innerWidth)
+      const base = { trigger: section, start: 'top top', end: () => '+=' + distance(), scrub: 1, invalidateOnRefresh: true }
+
+      gsap.to(strip, { x: () => -distance(), ease: 'none', scrollTrigger: { ...base, pin: true, anticipatePin: 1 } })
+      gsap.to('.gallery__progress i', { scaleX: 1, ease: 'none', scrollTrigger: { ...base, scrub: true } })
+
+      return () => section.classList.remove('is-pinned')
     })
+
     return () => mm.revert()
   }, [])
 
@@ -33,14 +36,26 @@ export default function Gallery() {
           <p className="lead">Ilustraciones de Shirow Masamune, el autor del manga original, y un fotograma de la película. Desliza para recorrerlas.</p>
         </div>
 
-        {ILLUSTRATIONS.map((w, i) => (
-          <figure className={'gallery__panel gallery__work' + (aspectOf(w.id) > 1 ? ' is-landscape' : '')} key={w.id} style={{ ['--ar' as string]: aspectOf(w.id) }}>
-            <div className="frame">
-              <ArtImg id={w.id} sizes={aspectOf(w.id) > 1 ? '(max-width: 899px) 86vw, 100vh' : '(max-width: 899px) 62vw, 46vh'} eager={i < 2} />
-            </div>
-            <figcaption className="mono">FIG. {String(i + 1).padStart(2, '0')} · {w.title}</figcaption>
-          </figure>
-        ))}
+        {ILLUSTRATIONS.map((w, i) => {
+          const ratio = aspectOf(w.id)
+          const wide = ratio > 1
+          return (
+            <figure
+              className={'gallery__panel gallery__work' + (wide ? ' is-landscape' : '')}
+              key={w.id}
+              style={{ ['--ar' as string]: ratio }}
+            >
+              <div className="frame">
+                <ArtImg
+                  id={w.id}
+                  sizes={wide ? '(max-width: 899px) 86vw, 100vh' : '(max-width: 899px) 62vw, 46vh'}
+                  eager={i < 2}
+                />
+              </div>
+              <figcaption className="mono">FIG. {String(i + 1).padStart(2, '0')} · {w.title}</figcaption>
+            </figure>
+          )
+        })}
 
         <div className="gallery__panel gallery__outro">
           <p className="credit mono">{CREDIT_ART}</p>

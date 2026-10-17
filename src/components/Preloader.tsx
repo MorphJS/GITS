@@ -7,24 +7,28 @@ export default function Preloader({ onDone }: { onDone: () => void }) {
   const bar = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const quick = prefersReduced()
+    const fast = prefersReduced()
+
     const ctx = gsap.context(() => {
-      const counter = { v: 0 }
-      gsap
-        .timeline({ onComplete: onDone })
-        .to(counter, {
-          v: 100,
-          duration: quick ? 0.3 : 1.8,
-          ease: 'power2.inOut',
-          onUpdate: () => {
-            const n = Math.round(counter.v)
-            if (num.current) num.current.textContent = String(n).padStart(3, '0')
-            if (bar.current) bar.current.style.transform = `scaleX(${n / 100})`
-          },
-        })
-        .to(root.current, { yPercent: -100, duration: quick ? 0.2 : 0.95, ease: 'power4.inOut' }, '+=0.15')
-        .set(root.current, { display: 'none' })
+      const count = { value: 0 }
+
+      const tl = gsap.timeline({ onComplete: onDone })
+
+      tl.to(count, {
+        value: 100,
+        duration: fast ? 0.3 : 1.8,
+        ease: 'power2.inOut',
+        onUpdate() {
+          const n = Math.round(count.value)
+          if (num.current) num.current.textContent = String(n).padStart(3, '0')
+          if (bar.current) bar.current.style.transform = `scaleX(${n / 100})`
+        },
+      })
+
+      tl.to(root.current, { yPercent: -100, duration: fast ? 0.2 : 0.95, ease: 'power4.inOut' }, '+=0.15')
+      tl.set(root.current, { display: 'none' })
     }, root)
+
     return () => ctx.revert()
   }, [onDone])
 
